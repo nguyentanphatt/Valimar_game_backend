@@ -9,3 +9,13 @@ export const createRequirement = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Error add requirement" });
   }
 };
+
+export const getRequirementById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const requirement = await prisma.requirement.findMany({ where: { gameId: parseInt(id) } });
+    res.status(200).json(requirement);
+  } catch (error) {
+    res.status(500).json({ error: "Error get requirement" });
+  }
+}

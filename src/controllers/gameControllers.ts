@@ -4,7 +4,7 @@ import { GameData } from "../constant/types";
 
 export const getAllGames = async (req: Request, res: Response) => {
   try {
-    const games = await prisma.game.findMany()
+    const games = await prisma.game.findMany();
     res.json(games);
   } catch (error) {
     res.status(500).json({ error: "Error get all game" + error });
@@ -27,7 +27,41 @@ export const createGame = async (req: Request, res: Response) => {
     });
     res.status(201).json(game);
   } catch (error) {
-    console.error('Error creating game:', error);
+    console.error("Error creating game:", error);
     res.status(500).json({ error: "Error add game" });
+  }
+};
+
+export const getGameByName = async (req: Request, res: Response) => {
+  const { name } = req.params;
+  try {
+    const game = await prisma.game.findMany({
+      where: {
+        name: {
+          contains: name,
+        },
+      },
+    });
+    res.status(200).json(game);
+  } catch (error) {
+    console.error("Error getting game by name:", error);
+    res.status(500).json({ error: "Error get game by name" });
+  }
+};
+
+export const getGameById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const game = await prisma.game.findUnique({
+      where: { id: parseInt(id) },
+      include: {
+        requirements: true,
+        screenshots: true,
+      },
+    });
+    res.status(200).json(game);
+  } catch (error) {
+    console.error("Error getting game by id:", error);
+    res.status(500).json({ error: "Error get game by id" });
   }
 };
