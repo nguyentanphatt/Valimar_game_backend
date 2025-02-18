@@ -3,6 +3,7 @@ import cors from 'cors';
 import gameRoutes from './routes/gameRoutes';
 import requirementRoutes from './routes/requirementRoutes'
 import screenshotsRoutes from './routes/screenshotRoutes';
+import userRoutes from './routes/userRoutes';
 
 const app = express();
 app.use(express.json());
@@ -11,6 +12,7 @@ app.use(cors());
 app.use('/games', gameRoutes);
 app.use('/requirements', requirementRoutes);
 app.use('/screenshots', screenshotsRoutes);
+app.use('/user', userRoutes)
 
 const PORT = process.env.PORT || 5000;
 
