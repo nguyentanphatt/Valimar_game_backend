@@ -17,7 +17,7 @@ model Game {
   id              Int          @id @default(autoincrement())
   name            String
   link            String
-  releaseDate     String
+  releaseDate     DateTime
   price           Float
   discountPrice   Float
   discountPercent Int

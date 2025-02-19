@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import prisma from "../models/prismaClient";
 import { GameData } from "../constant/types";
+import { console } from "inspector";
 
 export const getAllGames = async (req: Request, res: Response) => {
   try {
@@ -27,7 +28,6 @@ export const createGame = async (req: Request, res: Response) => {
     });
     res.status(201).json(game);
   } catch (error) {
-    console.error("Error creating game:", error);
     res.status(500).json({ error: "Error add game" });
   }
 };
@@ -44,7 +44,6 @@ export const getGameByName = async (req: Request, res: Response) => {
     });
     res.status(200).json(game);
   } catch (error) {
-    console.error("Error getting game by name:", error);
     res.status(500).json({ error: "Error get game by name" });
   }
 };
@@ -61,7 +60,55 @@ export const getGameById = async (req: Request, res: Response) => {
     });
     res.status(200).json(game);
   } catch (error) {
-    console.error("Error getting game by id:", error);
     res.status(500).json({ error: "Error get game by id" });
   }
 };
+
+export const getGameWithDiscount = async (req: Request, res: Response) => {
+  try {
+    const games = await prisma.game.findMany({
+      where: {
+        discountPercent: {
+          gt: 50
+        }
+      },
+      take: 12,
+    });
+    res.status(200).json(games);
+  } catch (error) {
+    res.status(500).json({ error: "Error getting games with discount" });
+  }
+}
+
+export const getGameNewRelease = async (req: Request, res: Response) => {
+  try {
+    const games = await prisma.game.findMany({
+      where: {
+        releaseDate: {
+          gt: new Date("2024-05-01")
+        }
+      },
+      take: 12,
+    });
+    res.status(200).json(games);
+  } catch (error) {
+    res.status(500).json({ error: "Error getting games with new release" });
+  }
+}
+
+export const getGameRelevantByGenre = async (req: Request, res: Response) => {
+  try {
+    const { firstGenre } = req.params;
+    const games = await prisma.game.findMany({
+      where:{
+        genre: {
+          contains: firstGenre
+        }
+      },
+      take: 12
+    })
+    res.status(200).json(games)
+  } catch (error) {
+    res.status(500).json({ error: "Error getting relevant games" });
+  }
+}
