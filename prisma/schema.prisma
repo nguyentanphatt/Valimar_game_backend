@@ -14,25 +14,26 @@ datasource db {
 }
 
 model Game {
-  id              Int          @id @default(autoincrement())
+  id              Int           @id @default(autoincrement())
   name            String
   link            String
   releaseDate     DateTime
   price           Float
   discountPrice   Float
   discountPercent Int
-  gameId          String       @unique
+  gameId          String        @unique
   imageUrl        String
   genre           String
   developer       String
   physical        Boolean
   requirements    Requirement[]
   screenshots     Screenshot[]
+  cartitem        CartItem[]
 }
 
 model Requirement {
   id        Int     @id @default(autoincrement())
-  gameId    Int     
+  gameId    Int
   type      String
   os        String?
   processor String?
@@ -52,10 +53,33 @@ model Screenshot {
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  name String?
-  email String @unique
+  id       Int      @id @default(autoincrement())
+  name     String?
+  email    String   @unique
   password String?
   createAt DateTime @default(now())
-  plan String @default("free")
+  plan     String   @default("free")
+  image    String?
+  cart     Cart[]
+}
+
+model Cart {
+  id               Int        @id @default(autoincrement())
+  createDate       DateTime
+  completedDate    DateTime?
+  status           String     @default("pending")
+  promocode        String?
+  deliveryLocation String?
+  userId           Int
+  user             User       @relation(fields: [userId], references: [id])
+  cartitem         CartItem[]
+}
+
+model CartItem {
+  id       Int     @id @default(autoincrement())
+  cartId   Int
+  gameId   Int
+  physical Boolean
+  cart     Cart    @relation(fields: [cartId], references: [id])
+  game     Game    @relation(fields: [gameId], references: [id])
 }

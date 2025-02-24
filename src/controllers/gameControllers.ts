@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../models/prismaClient";
 import { GameData } from "../constant/types";
-import { console } from "inspector";
 
 export const getAllGames = async (req: Request, res: Response) => {
   try {
@@ -26,7 +25,7 @@ export const createGame = async (req: Request, res: Response) => {
         screenshots: true,
       },
     });
-    res.status(201).json(game);
+    res.status(200).json(game);
   } catch (error) {
     res.status(500).json({ error: "Error add game" });
   }

@@ -8,8 +8,7 @@ const JWT_SECRET = process.env.JWT_SECRET as string;
 export const signup = async (req: Request, res: Response): Promise<void> => {
   const { name, email, password } = req.body;
   try {
-    if (!email || !password)
-    {
+    if (!email || !password) {
       res.status(400).json({ error: "Email and password are required" });
       return;
     }
@@ -33,22 +32,22 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
   try {
     if (!email || !password) {
-       res.status(400).json({ error: "Email and password are required" });
-       return;
+      res.status(400).json({ error: "Email and password are required" });
+      return;
     }
 
     const user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
-       res.status(400).json({ error: "Email not found" });
-       return;
+      res.status(400).json({ error: "Email not found" });
+      return;
     }
 
     const validPassword = await bcrypt.compare(password, user.password);
 
     if (!validPassword) {
-       res.status(400).json({ error: "Invalid password" });
-       return;
+      res.status(400).json({ error: "Invalid password" });
+      return;
     }
 
     const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
@@ -59,7 +58,6 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       token,
       user: { id: user.id, name: user.name, email: user.email },
     });
-
   } catch (error) {
     console.error("Error logging in:", error);
     res.status(500).json({ error: "Error logging in" });
@@ -70,21 +68,10 @@ export const userProfile = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    res.status(401).json({ error: "Unauthorized" });
-    return;
-  }
-
-  const token = authHeader.split(" ")[1];
+  const { email } = req.params;
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as {
-      id: number;
-      email: string;
-    };
-
-    const user = await prisma.user.findUnique({ where: { id: decoded.id } });
+    const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       res.status(400).json({ error: "User not found" });
       return;
@@ -95,3 +82,70 @@ export const userProfile = async (
     res.status(401).json({ error: "Invalid or expired token" });
   }
 };
+
+export const userLoginWithOath = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { email, name, image, provider } = req.body;
+
+  if (!email) {
+    res.status(400).json({ error: "Email is required" });
+    return;
+  }
+
+  try {
+    let user = await prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      user = await prisma.user.create({
+        data: { name, email, image },
+      });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("OAuth login error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+
+export const changeSubcriptionOfUser = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+
+  const { email } = req.params;
+  const { newPlan } = req.body;
+
+  const plans = ["free", "pathfinder", "trailblazer", "luminary"]
+
+  if(!plans.includes(newPlan)){
+    res.status(400).json({ error: "Invalid subscription plan" });
+    return;
+  }
+
+  try {
+    const user  = await prisma.user.findUnique({where: {email}})
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    const currentPlanIndex = plans.indexOf(user.plan);
+    const newPlanIndex = plans.indexOf(newPlan);
+    if (newPlanIndex < currentPlanIndex) {
+      res.status(400).json({ error: "Downgrading to a lower subscription is not allowed" });
+      return;
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { email },
+      data: { plan: newPlan },
+    });
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ error: "Something went wrong" });
+  }
+}
