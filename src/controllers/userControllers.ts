@@ -115,8 +115,7 @@ export const changeSubcriptionOfUser = async (
   res: Response
 ): Promise<void> => {
 
-  const { email } = req.params;
-  const { newPlan } = req.body;
+  const { newPlan, email } = req.body;
 
   const plans = ["free", "pathfinder", "trailblazer", "luminary"]
 
@@ -147,5 +146,23 @@ export const changeSubcriptionOfUser = async (
     res.status(200).json(updatedUser);
   } catch (error) {
     res.status(500).json({ error: "Something went wrong" });
+  }
+}
+
+export const getUserById = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { userId } = req.params
+  try {
+    const user = await prisma.user.findUnique({ where: { id:Number(userId) } });
+    if (!user) {
+      res.status(400).json({ error: "User not found" });
+      return;
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(401).json({ error: "Invalid or expired token" });
   }
 }
