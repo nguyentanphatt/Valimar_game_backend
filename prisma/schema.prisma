@@ -29,6 +29,7 @@ model Game {
   requirements    Requirement[]
   screenshots     Screenshot[]
   cartitem        CartItem[]
+  GameKey         GameKey[]
 }
 
 model Requirement {
@@ -82,4 +83,19 @@ model CartItem {
   physical Boolean
   cart     Cart    @relation(fields: [cartId], references: [id])
   game     Game    @relation(fields: [gameId], references: [id])
+}
+
+model GameKey {
+  id     Int    @id @default(autoincrement())
+  gameId Int
+  key    String
+  game   Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model Promocode {
+  id Int @id @default(autoincrement())
+  promocode String
+  percent Float
+  validDate DateTime
 }

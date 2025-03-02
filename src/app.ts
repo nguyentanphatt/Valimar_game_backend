@@ -5,6 +5,7 @@ import requirementRoutes from './routes/requirementRoutes'
 import screenshotsRoutes from './routes/screenshotRoutes';
 import userRoutes from './routes/userRoutes';
 import cartRoutes from './routes/cartRoutes'
+import promocodeRoutes from './routes/promocodeRoutes'
 
 const app = express();
 app.use(express.json());
@@ -15,6 +16,7 @@ app.use('/requirements', requirementRoutes);
 app.use('/screenshots', screenshotsRoutes);
 app.use('/user', userRoutes)
 app.use('/cart', cartRoutes)
+app.use('/promocode', promocodeRoutes)
 
 const PORT = process.env.PORT || 5000;
 
