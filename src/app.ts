@@ -9,7 +9,12 @@ import promocodeRoutes from './routes/promocodeRoutes'
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+//app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000', // Replace with your frontend URL
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true
+}));
 
 app.use('/games', gameRoutes);
 app.use('/requirements', requirementRoutes);
