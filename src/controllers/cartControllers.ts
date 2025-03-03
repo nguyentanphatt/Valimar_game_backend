@@ -31,6 +31,7 @@ export const addToCart = async (req: Request, res: Response): Promise<void> => {
           createDate: new Date(),
           status: "pending",
         },
+        include: {cartitem:true}
       });
     }
 
