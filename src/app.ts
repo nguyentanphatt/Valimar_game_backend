@@ -9,13 +9,14 @@ import promocodeRoutes from './routes/promocodeRoutes'
 
 const app = express();
 app.use(express.json());
-//app.use(cors());
 app.use(cors({
-  origin: 'http://localhost:3000', // Replace with your frontend URL
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true
+  origin: 'https://valimar-e-commerce-mcbpnk3vd-phats-projects-09db390c.vercel.app',
+  methods: 'GET,POST,PUT,DELETE',
+  allowedHeaders: 'Content-Type,Authorization'
 }));
 
+// Or allow all origins (not recommended for production)
+app.use(cors());
 app.use('/games', gameRoutes);
 app.use('/requirements', requirementRoutes);
 app.use('/screenshots', screenshotsRoutes);
